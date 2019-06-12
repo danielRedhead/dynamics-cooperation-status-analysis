@@ -19,7 +19,7 @@ setwd('~/Desktop/dynamics_cooperation_status_analysis')
 Check to see if you're in the right place by typing dir() and see whether this readme file is present. 
 
 
-The longitudinal analysis uses nine data files as input: 
+The longitudinal analysis uses six data files as input: 
 
 ```
 'village1_cooperation_t1.csv' - The cooperation network at time point 1 \
@@ -27,10 +27,7 @@ The longitudinal analysis uses nine data files as input:
 'village1_cooperation_t3.csv' - The cooperation network at time point 3 \
 'village1_kinship_t1.csv' - The kinship network at time point 1 \
 'village1_kinship_t2.csv' - The kinship network at time point 2 \
-'village1_status.csv' - The status ratings of all actors at each time point \
-'village1_strength_size.csv' - The physical strength and size of all actors at the first two time points \
-'village1_income.csv' - The income of all actors at the first two time points \
-'village1_log_age.csv' - The log age of all actors at the first two time points \
+'village1_attributes.csv' - Includes status, physical strength and size, income and log age \
 ```
 
 Please note that only data from the first two time points are used for varying covariates, and dyadic varying covariates (kinship), in the analysis. Another important note is that the rows in the cooperation and kinship matrices represent the individuals nominating. At each time point rows do not change and represent the same individuals. 
