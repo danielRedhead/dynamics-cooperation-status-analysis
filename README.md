@@ -3,7 +3,7 @@ Analysis scripts and data for "The dynamics of cooperation and social status in 
 
 Requirements: 
 
-- R (3.4.2 or greater): https://cran.r-project.org
+- R (3.5.2 or greater): https://cran.r-project.org
 - RSiena (1.2-4 or greater): https://www.stats.ox.ac.uk/~snijders/siena/
 - Statnet (2018.10 or greater):https://statnet.org
 
@@ -43,12 +43,20 @@ source('./village1_SAOM.R')
 
 However, I would advise to run the analysis script in blocks. 
 
-The cross-sectional analysis uses three data files as input: 
+The cross-sectional analysis uses six data files as input: 
 
 ```
 'village2_cooperation.csv' - The cooperation network \
 'village2_kinship.csv' - The kinship network \
 'village2_attributes.csv' - The attributes of actors (i.e. status, strength and size, income, log age)
+```
+
+There are three data files that only include participants with full data:
+
+```
+'village2_cooperation_deleted.csv' - The cooperation network \
+'village2_kinship_deleted.csv' - The kinship network \
+'village2_attributes_deleted.csv' - The attributes of actors (i.e. status, strength and size, income, log age)
 ```
 
 When the project folder is the working directory, the cross-sectional analysis may run itself (assuming that you have installed all of the dependencies) by calling
