@@ -81,7 +81,7 @@ cooperation.data <- sienaDataCreate(cooperation,
 #Check the descriptive statistics
 
 print01Report(data = cooperation.data,
-	 modelname = 'cooperation.status.out')
+	 modelname = './outputs/cooperation.status')
 
 print("Data specified and network descriptives available ")
 
@@ -89,7 +89,7 @@ print("Data specified and network descriptives available ")
 
 #Create the algorithms 
 
-alg1 <- sienaAlgorithmCreate(projname = 'cooperation_status', 
+alg1 <- sienaAlgorithmCreate(projname = './outputs/cooperation.status', 
 								n3 = 1000, 
 								seed = 54321, 
 								doubleAveraging = 0, 
@@ -98,7 +98,7 @@ alg1 <- sienaAlgorithmCreate(projname = 'cooperation_status',
 
 #Increase n3 to 3000 iterations for final model
 
-alg2 <- sienaAlgorithmCreate(projname = 'cooperation_status', 
+alg2 <- sienaAlgorithmCreate(projname = './outputs/cooperation.status', 
 								n3 = 3000, 
 								seed = 12345, 
 								doubleAveraging = 0, 
@@ -162,7 +162,7 @@ eff.2 <- includeEffects(eff.2, egoX, altX, simX,
 									interaction1 = 'income')
 eff.2 <- includeEffects(eff.2, egoX, altX, simX, 
 									interaction1 = 'log.age')
-eff.2 <- includeEffects(eff.2,totAlt, name = 'status', 
+eff.2 <- includeEffects(eff.2,avAlt, name = 'status', 
 									interaction1 = 'cooperation')
 eff.2 <- includeEffects(eff.2, effFrom, name = 'status', 
 									interaction1 = 'strength')
@@ -175,11 +175,11 @@ full.model <- siena07(alg1,
 						data = cooperation.data,
 						effects = eff.2,
 						initC = T,
-                        useCluster = T,
-                        nbrNodes = 4,
-                        batch = F,
-                        verbose = F
-                        )
+						useCluster = T,
+						nbrNodes = 4,
+						batch = F,
+						verbose = F
+						)
 summary(full.model)
 
 tt.3 <- sienaTimeTest(full.model)
@@ -188,14 +188,14 @@ summary(tt.3)
 eff.3 <- includeTimeDummy(eff.2, simX, interaction1 = "log.age")
 
 full.model.2 <- siena07(alg1, 
-                      data = cooperation.data,
-                      effects = eff.3,
-                      initC = T,
-                      useCluster = T,
-                      nbrNodes = 4,
-                      batch = F,
-                      verbose = F
-)
+						data = cooperation.data,
+						effects = eff.3,
+						initC = T,
+						useCluster = T,
+						nbrNodes = 4,
+						batch = F,
+						verbose = F
+						)
 
 summary(full.model)
 
@@ -204,42 +204,43 @@ summary(tt.4)
 
 eff.3.2 <- includeTimeDummy(eff.2, outActSqrt)
 
-full.model.3.2 <- siena07(alg1, 
-data = cooperation.data, 
-effects = eff.3.2, 
-initC = T,
-useCluster = T,
-nbrNodes = 4,
-batch = F,
-verbose = F,
-prevAns = full.model
-)
+full.model.3 <- siena07(alg1, 
+					  	data = cooperation.data, 
+						effects = eff.3, 
+						initC = T,
+						useCluster = T,
+						nbrNodes = 4,
+						batch = F,
+						verbose = F,
+						prevAns = full.model.2
+						)
 
-summary(full.model.3.2)
+summary(full.model.3)
 
 tt.4 <- sienaTimeTest(full.model.3)
 summary(tt.4)
 
 eff.3.3 <- includeTimeDummy(eff.3.2, simX, interaction1 = "log.age")
 
-full.model.3.3 <- siena07(alg1, 
-                          data = cooperation.data, 
-                          effects = eff.3.3, 
-                          initC = T,
-                          useCluster = T,
-                          nbrNodes = 4,
-                          batch = F,
-                          verbose = F,
-                          prevAns = full.model.3
-)
-summary(full.model.3.3)
+full.model.3.2 <- siena07(alg1, 
+							data = cooperation.data, 
+							effects = eff.3.3, 
+							initC = T,
+							useCluster = T,
+							nbrNodes = 4,
+							batch = F,
+							verbose = F,
+							prevAns = full.model.3
+							)
+summary(full.model.3.2)
 
-tt.5 <- sienaTimeTest(full.model.3.3)
+tt.5 <- sienaTimeTest(full.model.3.2)
 summary(tt.5)
+
 
 #Re-run the full model with larger n3
 
-full.model.3.4 <- siena07(alg2, 
+full.model.3.3 <- siena07(alg2, 
 						data = cooperation.data, 
 						effects = eff.3.3, 
 						initC = T,
@@ -247,16 +248,18 @@ full.model.3.4 <- siena07(alg2,
                         nbrNodes = 4,
                         batch = F,
                         verbose = F,
-						prevAns = full.model.3.3
+						prevAns = full.model.3.2
 						)
-summary(full.model.3.4)
+summary(full.model.3.3)
 
+#Assess the relative importance of effects 
 
+coop.RI <- sienaRI(cooperation.data, full.model.3.3)
 
 
 #Get p-values & CI for all parameters
 
-results <- full.model.3.4
+results <- full.model.3.3
 parameter <- results$effects$effectName
 estimate <- results$theta
 st.error <- sqrt(diag(results$covtheta))
@@ -278,26 +281,28 @@ coop.status.out <- data.frame(parameter,
                        
 coop.status.out
 
-write.csv(coop.status.out, file = "cooperation.status.outputs.csv")
+write.csv(coop.status.out, file = "./outputs/cooperation.status.outputs.csv")
+
+print("Full model outputs available")
 
 #Check partial model with only log age included 
 
-eff.3 <- includeEffects(eff.1.2, egoX, altX, simX,
+eff.4 <- includeEffects(eff.1.2, egoX, altX, simX,
 										 interaction1 = 'log.age')
-eff.3 <- includeEffects(eff.3, egoX, altX, simX,
+eff.4 <- includeEffects(eff.4, egoX, altX, simX,
 										 interaction1 = 'status')
-eff.3 <- includeEffects(eff.3, totAlt, name = 'status', 
+eff.4 <- includeEffects(eff.4, avAlt, name = 'status', 
 										interaction1 = 'cooperation')
-eff.3 <- includeEffects(eff.3, effFrom, name = 'status', 
+eff.4 <- includeEffects(eff.4, effFrom, name = 'status', 
 										interaction1 = 'log.age')
-eff.3 <- includeEffects(eff.3, effFrom, name = 'status', 
+eff.4 <- includeEffects(eff.4, effFrom, name = 'status', 
 										interaction1 = 'strength')
-eff.3 <- includeEffects(eff.3, effFrom, name = 'status', 
+eff.4 <- includeEffects(eff.4, effFrom, name = 'status', 
 										interaction1 = 'income')
 
 age.model <- siena07(alg1, 
 					data = cooperation.data, 
-					effects = eff.3,
+					effects = eff.4,
 					initC = T,
                     useCluster = T,
                     nbrNodes = 4,
@@ -309,7 +314,7 @@ summary(age.model)
 
 age.model.2 <- siena07(alg2, 
 						data = cooperation.data, 
-						effects = eff.3, 
+						effects = eff.4, 
 						initC = T,
                          useCluster = T,
                          nbrNodes = 4,
@@ -341,4 +346,261 @@ partial.out
 
 write.csv(partial.out, file ="./outputs/partial-model-output.csv")
 
+print("Partial model outputs available")
 
+#############################
+# Reviewer Revisions
+#############################
+
+#Check whether estimate remains with Average alter
+
+
+#Now specify the full model
+
+eff.5 <- includeEffects(eff.1.2, egoX, altX, simX, 
+									interaction1 = 'status')
+eff.5 <- includeEffects(eff.5, egoX, altX, simX, 
+									interaction1 = 'strength')
+eff.5 <- includeEffects(eff.5, egoX, altX, simX, 
+									interaction1 = 'income')
+eff.5 <- includeEffects(eff.5, egoX, altX, simX, 
+									interaction1 = 'log.age')
+eff.5 <- includeEffects(eff.5, totAlt, name = 'status', 
+									interaction1 = 'cooperation')
+eff.5 <- includeEffects(eff.5, effFrom, name = 'status', 
+									interaction1 = 'strength')
+eff.5 <- includeEffects(eff.5, effFrom, name = 'status', 
+									interaction1 = 'income')
+eff.5 <- includeEffects(eff.5, effFrom, name = 'status', 
+									interaction1 = 'log.age')
+
+revision.model <- siena07(alg1, 
+						data = cooperation.data,
+						effects = eff.5,
+						initC = T,
+						useCluster = T,
+						nbrNodes = 4,
+						batch = F,
+						verbose = F
+						)
+summary(revision.model)
+
+revision.model <- siena07(alg2, 
+						data = cooperation.data,
+						effects = eff.5,
+						initC = T,
+						useCluster = T,
+						nbrNodes = 4,
+						batch = F,
+						verbose = F,
+						prevAns = revision.model)
+summary(revision.model)
+
+#Results still hold with avAlt, no qualitative differences
+
+results <- revision.model
+parameter <- results$effects$effectName
+estimate <- results$theta
+st.error <- sqrt(diag(results$covtheta))
+norm.var <- estimate/st.error
+pval <- 2*pnorm(abs(norm.var), lower.tail = F)
+
+
+revision.coop.status.out <- data.frame(parameter,
+                       estimate = round(estimate, 3),
+                       st.error = round(st.error, 3),
+                       norm.var = round(norm.var, 2),
+                       pval = round(pval, 3),
+                       OR = round(exp(estimate), 2),
+                        CI.low = round(exp(estimate -
+                       	 	qnorm(0.975)*st.error), 2),
+                        CI.high = round(exp(estimate 
+                        	+ qnorm(0.975)*st.error), 2)
+                        )
+                       
+revision.coop.status.out
+write.csv(revision.coop.status.out, file = "./outputs/table_S5.csv")
+
+#Check whether estimate remains with average in alter
+
+
+eff.6 <- includeEffects(eff.1.2, egoX, altX, simX, 
+									interaction1 = 'status')
+eff.6 <- includeEffects(eff.6, egoX, altX, simX, 
+									interaction1 = 'strength')
+eff.6 <- includeEffects(eff.6, egoX, altX, simX, 
+									interaction1 = 'income')
+eff.6 <- includeEffects(eff.6, egoX, altX, simX, 
+									interaction1 = 'log.age')
+eff.6 <- includeEffects(eff.6, avInAlt, name = 'status', 
+									interaction1 = 'cooperation')
+eff.6 <- includeEffects(eff.6, effFrom, name = 'status', 
+									interaction1 = 'strength')
+eff.6 <- includeEffects(eff.6, effFrom, name = 'status', 
+									interaction1 = 'income')
+eff.6 <- includeEffects(eff.6, effFrom, name = 'status', 
+									interaction1 = 'log.age')
+
+revision.model.2 <- siena07(alg1, 
+						data = cooperation.data,
+						effects = eff.6,
+						initC = T,
+						useCluster = T,
+						nbrNodes = 4,
+						batch = F,
+						verbose = F
+						)
+summary(revision.model.2)
+
+#Rerun with larger n3
+
+revision.model.2 <- siena07(alg2, 
+						data = cooperation.data,
+						effects = eff.6,
+						initC = T,
+						useCluster = T,
+						nbrNodes = 4,
+						batch = F,
+						verbose = F,
+						prevAns = revision.model.2)
+
+summary(revision.model.2)
+
+results <- revision.model.2
+parameter <- results$effects$effectName
+estimate <- results$theta
+st.error <- sqrt(diag(results$covtheta))
+norm.var <- estimate/st.error
+pval <- 2*pnorm(abs(norm.var), lower.tail = F)
+
+revision.coop.status.out.2 <- data.frame(parameter,
+                                       estimate = round(estimate, 3),
+                                       st.error = round(st.error, 3),
+                                       norm.var = round(norm.var, 2),
+                                       pval = round(pval, 3),
+                                       OR = round(exp(estimate), 2),
+                                       CI.low = round(exp(estimate -
+                                                            qnorm(0.975)*st.error), 2),
+                                       CI.high = round(exp(estimate 
+                                                           + qnorm(0.975)*st.error), 2)
+)
+
+revision.coop.status.out.2
+write.csv(revision.coop.status.out.2, file = "./outputs/table_S6.csv")
+
+#No qualitative differences in most parameter estimates
+#However, the effect from strength is reduced. 
+
+#Check whether estimate remains with total in alter
+
+
+eff.7 <- includeEffects(eff.1.2, egoX, altX, simX, 
+									interaction1 = 'status')
+eff.7 <- includeEffects(eff.7, egoX, altX, simX, 
+									interaction1 = 'strength')
+eff.7 <- includeEffects(eff.7, egoX, altX, simX, 
+									interaction1 = 'income')
+eff.7 <- includeEffects(eff.7, egoX, altX, simX, 
+									interaction1 = 'log.age')
+eff.7 <- includeEffects(eff.7, totInAlt, name = 'status', 
+									interaction1 = 'cooperation')
+eff.7 <- includeEffects(eff.7, effFrom, name = 'status', 
+									interaction1 = 'strength')
+eff.7 <- includeEffects(eff.7, effFrom, name = 'status', 
+									interaction1 = 'income')
+eff.7 <- includeEffects(eff.7, effFrom, name = 'status', 
+									interaction1 = 'log.age')
+
+revision.model.3 <- siena07(alg1, 
+						data = cooperation.data,
+						effects = eff.7,
+						initC = T,
+						useCluster = T,
+						nbrNodes = 4,
+						batch = F,
+						verbose = F
+						)
+
+summary(revision.model.3)
+
+#Rerun with larger n3
+
+revision.model.3 <- siena07(alg2, 
+						data = cooperation.data,
+						effects = eff.7,
+						initC = T,
+						useCluster = T,
+						nbrNodes = 4,
+						batch = F,
+						verbose = F,
+						prevAns = revision.model.3)
+summary(revision.model.3)
+
+results <- revision.model.3
+parameter <- results$effects$effectName
+estimate <- results$theta
+st.error <- sqrt(diag(results$covtheta))
+norm.var <- estimate/st.error
+pval <- 2*pnorm(abs(norm.var), lower.tail = F)
+
+
+
+revision.out.3 <- data.frame(parameter,
+                       estimate = round(estimate, 3),
+                       st.error = round(st.error, 3),
+                       norm.var = round(norm.var, 2),
+                       pval = round(pval, 3),
+                       OR = round(exp(estimate), 2),
+                        CI.low = round(exp(estimate -
+                                             qnorm(0.975)*st.error), 2),
+                        CI.high = round(exp(estimate + qnorm(0.975)*st.error), 2)
+                        )
+                       
+revision.out.3
+write.csv(revision.out.3, file = "./outputs/table_S7.csv")
+
+
+
+#Parameter estimates are qualitatively the same 
+
+#Check whether indegree and outdegree do impact status dynamics
+
+
+eff.8 <- includeEffects(eff.1.2, egoX, altX, simX, 
+									interaction1 = 'status')
+eff.8 <- includeEffects(eff.8, egoX, altX, simX, 
+									interaction1 = 'strength')
+eff.8 <- includeEffects(eff.8, egoX, altX, simX, 
+									interaction1 = 'income')
+eff.8 <- includeEffects(eff.8, egoX, altX, simX, 
+									interaction1 = 'log.age')
+eff.8 <- includeEffects(eff.8, avAlt, name = 'status', 
+									interaction1 = 'cooperation')
+
+eff.8 <- includeEffects(eff.8, effFrom, name = 'status', 
+									interaction1 = 'strength')
+eff.8<- includeEffects(eff.8, effFrom, name = 'status', 
+									interaction1 = 'income')
+eff.8 <- includeEffects(eff.8, effFrom, name = 'status', 
+									interaction1 = 'log.age')
+eff.8 <- setEffect(eff.8, outdeg, name = 'status', 
+									interaction1 = 'cooperation',
+									fix = TRUE, parameter = 0, test = TRUE)
+eff.8 <- setEffect(eff.8, indeg, name = 'status', 
+									interaction1 = 'cooperation',
+									fix = TRUE, parameter = 0, test = TRUE)
+
+revision.model.4 <- siena07(alg1, 
+						data = cooperation.data,
+						effects = eff.8,
+						initC = T,
+						useCluster = T,
+						nbrNodes = 4,
+						batch = F,
+						verbose = F
+						)
+
+summary(revision.model.4)
+
+#Indegree may have a marginal positive association with increased status
+#However, indegree is colinear with quadratic shape and can't be estimated
