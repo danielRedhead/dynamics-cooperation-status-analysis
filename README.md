@@ -30,7 +30,7 @@ The longitudinal analysis uses six data files as input:
 'village1_attributes.csv' - Includes status, physical strength and size, income and log age \
 ```
 
-Please note that only data from the first two time points are used for varying covariates, and dyadic varying covariates (kinship), in the analysis. Another important note is that the rows in the cooperation and kinship matrices represent the individuals nominating. At each time point rows do not change and represent the same individuals. 
+Please note that only data from the first two time points are used for varying covariates, and dyadic varying covariates (kinship), in the analysis. Another important note is that the rows and columns in the cooperation and kinship matrices represent the individuals nominating. At each time point rows do not change and represent the same individuals as the rows in the attributes files.
 
 When the project folder is the working directory, the longitudinal analysis may run itself (assuming that you have installed all of the dependencies) by calling
 
